@@ -1,5 +1,4 @@
 module Derivative where
-import Text.Parsec
 
 data Val = Plus Val Val | Minus Val Val | Multiply Val Val | Divide Val Val | NaturalLog Val | ETo Val Val | VTo Val Val | Num Double | X
 
@@ -38,13 +37,26 @@ derivative (Num _) = Num 0.0
 
 derivative X = Num 1.0
 
+distribute::Double->Val->Val
+distribute n (Num a) = Num (a * n)
+distribute n X = Multiply (Num n ) X
+distribute n (Plus a b) = Plus (distribute n a) (distribute n b)
+distribute n (Minus a b) = Minus (distribute n a) (distribute n b)
+distribute n (Divide a b) = Divide (distribute n a) b
+distribute n (Multiply (Num a) x) = distribute (n*a) x
+distribute n (Multiply x (Num a)) = distribute (n*a) x
+distribute n a@(NaturalLog _) = Multiply (Num n) a
+distribute n e@(ETo _ _) = Multiply (Num n) e
+distribute n (VTo x a) = VTo (distribute n x) a
+
 simplify::Val->Val
 simplify (Plus (Num a) (Num b)) = Num (a + b)
 
 simplify (Minus (Num a) (Num b)) = Num (a - b)
 
 simplify (Multiply (Num a) (Num b)) = Num (a * b)
-simplify (Multiply (Num a) (Multiply (Num b) x)) = Multiply (Num (a * b)) x
+simplify (Multiply (Num a) x) = distribute a x
+simplify (Multiply x (Num a)) = distribute a x
 
 simplify (Divide (Num a) (Num b)) = Num (a / b)
 
