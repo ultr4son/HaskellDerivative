@@ -30,7 +30,7 @@ derivative (NaturalLog a) = Multiply (Divide (Num 1.0) a) (derivative a)
 
 derivative (ETo k x) = Multiply ( Multiply k (ETo (Num 1.0) x) ) (derivative x)
 
-derivative (VTo x (Num c)) = Multiply (Num c) (VTo x (Num (c - 1)))
+-- derivative (VTo x (Num c)) = Multiply (Num c) (VTo x (Num (c - 1)))
 
 derivative (VTo x a) = Multiply (Multiply a (VTo x (Minus a (Num 1.0)))) (derivative x)
 
